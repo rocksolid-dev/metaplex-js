@@ -97,8 +97,19 @@ export const placeBid = async ({
     txBatch.addSigner(account);
     txBatch.addTransaction(createBidderPotTransaction);
     bidderPotToken = account.publicKey;
-     // */
 
+    console.log('Bidder pot token: ', bidderPotToken);
+    console.log('Bidder pot token: ', {
+      data: { feePayer: bidder },
+      info: {
+        newAccountPubkey: account.publicKey,
+        lamports: accountRentExempt,
+        mint: auctionTokenMint,
+        owner: auction,
+      },
+    });
+
+    // */
     // bidderPotToken = await AuctionProgram.findProgramAddress([
     //   Buffer.from(AuctionProgram.PREFIX),
     //   bidderPot.toBuffer(),
