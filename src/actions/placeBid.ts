@@ -43,12 +43,12 @@ export interface PlaceBidResponse {
  * Place a bid by taking it from the provided wallet and placing it in the bidder pot account.
  */
 export const placeBid = async ({
-                                 connection,
-                                 wallet,
-                                 amount,
-                                 auction,
-                                 bidderPotToken,
-                               }: PlaceBidParams): Promise<PlaceBidResponse> => {
+  connection,
+  wallet,
+  amount,
+  auction,
+  bidderPotToken,
+}: PlaceBidParams): Promise<PlaceBidResponse> => {
   // get data for transactions
   const bidder = wallet.publicKey;
   const accountRentExempt = await connection.getMinimumBalanceForRentExemption(AccountLayout.span);
@@ -83,6 +83,22 @@ export const placeBid = async ({
     ////
   } else {
     // create a new account for bid
+    /*
+    const account = Keypair.generate();
+    const createBidderPotTransaction = new CreateTokenAccount(
+      { feePayer: bidder },
+      {
+        newAccountPubkey: account.publicKey,
+        lamports: accountRentExempt,
+        mint: auctionTokenMint,
+        owner: auction,
+      },
+    );
+    txBatch.addSigner(account);
+    txBatch.addTransaction(createBidderPotTransaction);
+    bidderPotToken = account.publicKey;
+     */
+
     bidderPotToken = await AuctionProgram.findProgramAddress([
       Buffer.from(AuctionProgram.PREFIX),
       bidderPot.toBuffer(),
@@ -98,6 +114,7 @@ export const placeBid = async ({
     closeTokenAccountTx,
   } = await createWrappedAccountTxs(connection, bidder, amount.toNumber() + accountRentExempt * 2);
   txBatch.addTransaction(createTokenAccountTx);
+  //txBatch.addAfterTransaction(closeTokenAccountTx);
   txBatch.addSigner(payingAccount);
   ////
 
@@ -115,10 +132,7 @@ export const placeBid = async ({
   txBatch.addAfterTransaction(createRevokeTx);
   txBatch.addSigner(transferAuthority);
   ////
-
-  // token account must be closed after the revoke instruction
   txBatch.addAfterTransaction(closeTokenAccountTx);
-
   // create place bid transaction
   const placeBidTransaction = new PlaceBid(
     { feePayer: bidder },
