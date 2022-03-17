@@ -78,6 +78,7 @@ export const placeBid = async ({
       Buffer.from('bidder_pot_token'),
     ]);
 
+
     /*
     const account = Keypair.generate();
     const createBidderPotTransaction = new CreateTokenAccount(
@@ -120,6 +121,18 @@ export const placeBid = async ({
   txBatch.addTransaction(createTokenAccountTransaction);
   txBatch.addSigner(payingAccount);
   ////
+
+  await sendTransaction({
+    connection,
+    wallet,
+    txs: txBatch.toTransactions(),
+    signers: txBatch.signers,
+  });
+
+  await new Promise((resolve) => setTimeout(resolve, 5000));
+
+  txBatch = new TransactionsBatch({ transactions: [] });
+  txBatch.addSigner(payingAccount);
 
   // transfer authority
   const transferAuthority = Keypair.generate();
