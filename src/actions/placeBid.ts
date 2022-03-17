@@ -49,6 +49,9 @@ export const placeBid = async ({
   auction,
   bidderPotToken,
 }: PlaceBidParams): Promise<PlaceBidResponse> => {
+  console.log('ABOVE PLACEBID');
+  console.log(bidderPotToken, auction, amount);
+
   // get data for transactions
   const bidder = wallet.publicKey;
   const accountRentExempt = await connection.getMinimumBalanceForRentExemption(AccountLayout.span);

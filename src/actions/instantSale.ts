@@ -35,12 +35,16 @@ export const instantSale = async ({
   store,
   auction,
 }: InstantSaleParams): Promise<InstantSaleResponse> => {
+  console.log('ABOVE INSTANTSALE');
+  console.log(store, auction);
+
   const txIds = [];
   // get data for transactions
   const auctionManagerPDA = await AuctionManager.getPDA(auction);
   const manager = await AuctionManager.load(connection, auctionManagerPDA);
   const vault = await Vault.load(connection, manager.data.vault);
   const auctionExtendedPDA = await AuctionExtended.getPDA(vault.pubkey);
+  console.log('5');
   const {
     data: { instantSalePrice },
   } = await AuctionExtended.load(connection, auctionExtendedPDA);
@@ -54,6 +58,7 @@ export const instantSale = async ({
   } = await SafetyDepositConfig.load(connection, safetyDepositConfigPDA);
   ////
 
+  console.log('1');
   const { txId: placeBidTxId, bidderPotToken } = await placeBid({
     connection,
     wallet,
@@ -61,16 +66,19 @@ export const instantSale = async ({
     auction,
   });
   txIds.push(placeBidTxId);
+  console.log('2');
 
   // wait for all accounts to be created
   await connection.confirmTransaction(placeBidTxId, 'finalized');
 
+  console.log('3');
   const {
     data: { bidState },
   } = await Auction.load(connection, auction);
   const winIndex = bidState.getWinnerIndex(wallet.publicKey.toBase58());
   const hasWinner = winIndex !== null;
 
+  console.log('4');
   // NOTE: it's divided into several transactions since transaction size is restricted
   if (hasWinner) {
     switch (winningConfigType) {
