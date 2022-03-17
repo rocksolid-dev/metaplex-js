@@ -49,9 +49,6 @@ export const placeBid = async ({
   auction,
   bidderPotToken,
 }: PlaceBidParams): Promise<PlaceBidResponse> => {
-  console.log('ABOVE PLACEBID');
-  console.log(bidderPotToken, auction, amount);
-
   // get data for transactions
   const bidder = wallet.publicKey;
   const accountRentExempt = await connection.getMinimumBalanceForRentExemption(AccountLayout.span);
@@ -85,8 +82,6 @@ export const placeBid = async ({
     });
     ////
   } else {
-    // create a new account for bid
-
     const account = Keypair.generate();
     const createBidderPotTransaction = new CreateTokenAccount(
       { feePayer: bidder },
@@ -101,24 +96,11 @@ export const placeBid = async ({
     txBatch.addTransaction(createBidderPotTransaction);
     bidderPotToken = account.publicKey;
 
-    console.log('Bidder pot token: ', bidderPotToken);
-    console.log('Bidder pot token: ', {
-      data: { feePayer: bidder },
-      info: {
-        newAccountPubkey: account.publicKey,
-        lamports: accountRentExempt,
-        mint: auctionTokenMint,
-        owner: auction,
-      },
-    });
-
-    // */
     // bidderPotToken = await AuctionProgram.findProgramAddress([
     //   Buffer.from(AuctionProgram.PREFIX),
     //   bidderPot.toBuffer(),
     //   Buffer.from('bidder_pot_token'),
     // ]);
-    ////
   }
 
   // create paying account
@@ -146,7 +128,7 @@ export const placeBid = async ({
   txBatch.addAfterTransaction(createRevokeTx);
   txBatch.addSigner(transferAuthority);
   ////
-  txBatch.addAfterTransaction(closeTokenAccountTx);
+  //txBatch.addAfterTransaction(closeTokenAccountTx);
   // create place bid transaction
   const placeBidTransaction = new PlaceBid(
     { feePayer: bidder },
