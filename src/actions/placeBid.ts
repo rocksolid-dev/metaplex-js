@@ -82,6 +82,7 @@ export const placeBid = async ({
     });
     ////
   } else {
+    /*
     const account = Keypair.generate();
     const createBidderPotTransaction = new CreateTokenAccount(
       { feePayer: bidder },
@@ -96,11 +97,13 @@ export const placeBid = async ({
     txBatch.addTransaction(createBidderPotTransaction);
     bidderPotToken = account.publicKey;
 
-    // bidderPotToken = await AuctionProgram.findProgramAddress([
-    //   Buffer.from(AuctionProgram.PREFIX),
-    //   bidderPot.toBuffer(),
-    //   Buffer.from('bidder_pot_token'),
-    // ]);
+     */
+
+    bidderPotToken = await AuctionProgram.findProgramAddress([
+      Buffer.from(AuctionProgram.PREFIX),
+      bidderPot.toBuffer(),
+      Buffer.from('bidder_pot_token'),
+    ]);
   }
 
   // create paying account
@@ -110,7 +113,6 @@ export const placeBid = async ({
     closeTokenAccountTx,
   } = await createWrappedAccountTxs(connection, bidder, amount.toNumber() + accountRentExempt * 2);
   txBatch.addTransaction(createTokenAccountTx);
-  //txBatch.addAfterTransaction(closeTokenAccountTx);
   txBatch.addSigner(payingAccount);
   ////
 
@@ -127,8 +129,9 @@ export const placeBid = async ({
   txBatch.addTransaction(createApproveTx);
   txBatch.addAfterTransaction(createRevokeTx);
   txBatch.addSigner(transferAuthority);
-  ////
-  //txBatch.addAfterTransaction(closeTokenAccountTx);
+
+  txBatch.addAfterTransaction(closeTokenAccountTx);
+
   // create place bid transaction
   const placeBidTransaction = new PlaceBid(
     { feePayer: bidder },
