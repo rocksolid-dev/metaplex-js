@@ -14,9 +14,6 @@ node_modules/
 .eslintcache
 
 # Build and test
-dist/
-build/
-lib/
 coverage/
 
 # JetBrains
