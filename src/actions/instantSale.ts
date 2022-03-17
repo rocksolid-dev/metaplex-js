@@ -23,6 +23,7 @@ export interface InstantSaleParams {
   wallet: Wallet;
   auction: PublicKey;
   store: PublicKey;
+  bidderPotKey?: PublicKey;
 }
 
 export interface InstantSaleResponse {
@@ -34,6 +35,7 @@ export const instantSale = async ({
   wallet,
   store,
   auction,
+  bidderPotKey,
 }: InstantSaleParams): Promise<InstantSaleResponse> => {
   const txIds = [];
   // get data for transactions
@@ -59,6 +61,8 @@ export const instantSale = async ({
     wallet,
     amount: instantSalePrice,
     auction,
+    bidderPotToken: undefined,
+    bidderPotKey,
   });
   txIds.push(placeBidTxId);
 

@@ -31,6 +31,7 @@ export interface PlaceBidParams {
   /** Amount of tokens (accounting for decimals) or lamports to bid. One important nuance to remember is that each token mint has a different amount of decimals, which need to be accounted while specifying the amount. For instance, to send 1 token with a 0 decimal mint you would provide `1` as the amount, but for a token mint with 6 decimals you would provide `1000000` as the amount to transfer one whole token **/
   amount: BN;
   commitment?: Commitment;
+  bidderPotKey?: PublicKey;
 }
 
 export interface PlaceBidResponse {
@@ -48,6 +49,7 @@ export const placeBid = async ({
   amount,
   auction,
   bidderPotToken,
+  bidderPotKey,
 }: PlaceBidParams): Promise<PlaceBidResponse> => {
   // get data for transactions
   const bidder = wallet.publicKey;
@@ -96,14 +98,73 @@ export const placeBid = async ({
     txBatch.addSigner(account);
     txBatch.addTransaction(createBidderPotTransaction);
     bidderPotToken = account.publicKey;
+         */
 
-     */
+    bidderPotToken =
+      bidderPotKey ||
+      (await AuctionProgram.findProgramAddress([
+        Buffer.from(AuctionProgram.PREFIX),
+        bidderPot.toBuffer(),
+        Buffer.from('bidder_pot_token'),
+      ]));
 
+    /*
+    const bidderPotKey = await ({
+      auctionProgramId,
+      auctionKey,
+      bidderPubkey,
+    });
+
+    const bidderMetaKey: StringPublicKey = (
+      await findProgramAddress(
+        [
+          Buffer.from(AUCTION_PREFIX),
+          toPublicKey(auctionProgramId).toBuffer(),
+          toPublicKey(auctionKey).toBuffer(),
+          toPublicKey(bidderPubkey).toBuffer(),
+          Buffer.from('metadata'),
+        ],
+        toPublicKey(auctionProgramId),
+      )
+    )[0];
+    let bidderPotTokenAccount: PublicKey;
+    if (!bidderPotTokenPubkey) {
+      bidderPotTokenAccount = toPublicKey(
+        (
+          await findProgramAddress(
+            [
+              Buffer.from(AUCTION_PREFIX),
+              toPublicKey(bidderPotKey).toBuffer(),
+              Buffer.from(BIDDER_POT_TOKEN),
+            ],
+            toPublicKey(auctionProgramId),
+          )
+        )[0],
+      );
+    } else {
+      bidderPotTokenAccount = toPublicKey(bidderPotTokenPubkey);
+    }
+
+    /*
+    await AuctionProgram.findProgramAddress(
+      [
+        Buffer.from(AuctionProgram.PREFIX),
+        toPublicKey(auctionProgramId).toBuffer(),
+        toPublicKey(auctionKey).toBuffer(),
+        toPublicKey(bidderPubkey).toBuffer(),
+      ],
+      toPublicKey(auctionProgramId),
+    )
+
+
+
+    /*
     bidderPotToken = await AuctionProgram.findProgramAddress([
       Buffer.from(AuctionProgram.PREFIX),
       bidderPot.toBuffer(),
       Buffer.from('bidder_pot_token'),
     ]);
+     */
   }
 
   // create paying account

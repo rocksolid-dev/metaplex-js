@@ -9,10 +9,11 @@ export interface PlaceBidParams {
     bidderPotToken?: PublicKey;
     amount: BN;
     commitment?: Commitment;
+    bidderPotKey?: PublicKey;
 }
 export interface PlaceBidResponse {
     txId: TransactionSignature;
     bidderPotToken: PublicKey;
     bidderMeta: PublicKey;
 }
-export declare const placeBid: ({ connection, wallet, amount, auction, bidderPotToken, }: PlaceBidParams) => Promise<PlaceBidResponse>;
+export declare const placeBid: ({ connection, wallet, amount, auction, bidderPotToken, bidderPotKey, }: PlaceBidParams) => Promise<PlaceBidResponse>;

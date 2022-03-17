@@ -6,8 +6,9 @@ export interface InstantSaleParams {
     wallet: Wallet;
     auction: PublicKey;
     store: PublicKey;
+    bidderPotKey?: PublicKey;
 }
 export interface InstantSaleResponse {
     txIds: TransactionSignature[];
 }
-export declare const instantSale: ({ connection, wallet, store, auction, }: InstantSaleParams) => Promise<InstantSaleResponse>;
+export declare const instantSale: ({ connection, wallet, store, auction, bidderPotKey, }: InstantSaleParams) => Promise<InstantSaleResponse>;
