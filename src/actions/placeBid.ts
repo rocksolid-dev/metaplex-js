@@ -4,7 +4,13 @@ import { AccountLayout, NATIVE_MINT, Token, TOKEN_PROGRAM_ID } from '@solana/spl
 import { Wallet } from '../wallet';
 import { Connection } from '../Connection';
 import { sendTransaction } from './transactions';
-import { AuctionExtended, BidderMetadata, BidderPot, PlaceBid } from '../programs/auction';
+import {
+  AuctionProgram,
+  AuctionExtended,
+  BidderMetadata,
+  BidderPot,
+  PlaceBid,
+} from '../programs/auction';
 import { TransactionsBatch } from '../utils/transactions-batch';
 import { getCancelBidTransactions } from './cancelBid';
 import { AuctionManager } from '../programs/metaplex';
@@ -66,6 +72,13 @@ export const placeBid = async ({
     ////
   } else {
     // create a new account for bid
+    bidderPotToken = await AuctionProgram.findProgramAddress([
+      Buffer.from(AuctionProgram.PREFIX),
+      bidderPot.toBuffer(),
+      Buffer.from('bidder_pot_token'),
+    ]);
+
+    /*
     const account = Keypair.generate();
     const createBidderPotTransaction = new CreateTokenAccount(
       { feePayer: bidder },
@@ -79,6 +92,8 @@ export const placeBid = async ({
     txBatch.addSigner(account);
     txBatch.addTransaction(createBidderPotTransaction);
     bidderPotToken = account.publicKey;
+
+     */
     ////
   }
 
@@ -103,7 +118,6 @@ export const placeBid = async ({
     ),
   );
   txBatch.addTransaction(createTokenAccountTransaction);
-  txBatch.addAfterTransaction(closeTokenAccountTransaction);
   txBatch.addSigner(payingAccount);
   ////
 
@@ -126,6 +140,7 @@ export const placeBid = async ({
   );
   txBatch.addAfterTransaction(createRevokeTransaction);
   txBatch.addSigner(transferAuthority);
+  txBatch.addAfterTransaction(closeTokenAccountTransaction);
   ////
 
   // create place bid transaction
