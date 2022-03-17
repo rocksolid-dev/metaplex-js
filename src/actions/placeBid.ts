@@ -100,13 +100,12 @@ export const placeBid = async ({
     bidderPotToken = account.publicKey;
          */
 
-    bidderPotToken =
-      bidderPotKey ||
-      (await AuctionProgram.findProgramAddress([
-        Buffer.from(AuctionProgram.PREFIX),
-        bidderPot.toBuffer(),
-        Buffer.from('bidder_pot_token'),
-      ]));
+    bidderPotToken = bidderPotKey;
+    // (await AuctionProgram.findProgramAddress([
+    //   Buffer.from(AuctionProgram.PREFIX),
+    //   bidderPot.toBuffer(),
+    //   Buffer.from('bidder_pot_token'),
+    // ]));
 
     /*
     const bidderPotKey = await ({
