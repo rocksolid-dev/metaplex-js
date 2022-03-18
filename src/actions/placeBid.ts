@@ -5,7 +5,7 @@ import { Wallet } from '../wallet';
 import { Connection } from '../Connection';
 import { sendTransaction } from './transactions';
 import {
-  AuctionExtended,
+  AuctionExtended, AuctionProgram,
   BidderMetadata,
   BidderPot,
   PlaceBid,
@@ -13,7 +13,6 @@ import {
 import { AuctionManager } from '@metaplex-foundation/mpl-metaplex';
 import { TransactionsBatch } from '../utils/transactions-batch';
 import { getCancelBidTransactions } from './cancelBid';
-import { CreateTokenAccount } from '../transactions';
 import { createApproveTxs, createWrappedAccountTxs } from './shared';
 
 interface IPlaceBidParams {
@@ -72,6 +71,13 @@ export const placeBid = async ({
     });
     ////
   } else {
+    bidderPotToken = await AuctionProgram.findProgramAddress([
+      Buffer.from(AuctionProgram.PREFIX),
+      bidderPot.toBuffer(),
+      Buffer.from('bidder_pot_token'),
+    ]);
+
+    /*
     // create a new account for bid
     const account = Keypair.generate();
     const createBidderPotTransaction = new CreateTokenAccount(
@@ -87,6 +93,7 @@ export const placeBid = async ({
     txBatch.addTransaction(createBidderPotTransaction);
     bidderPotToken = account.publicKey;
     ////
+     */
   }
 
   // create paying account
@@ -96,7 +103,7 @@ export const placeBid = async ({
     closeTokenAccountTx,
   } = await createWrappedAccountTxs(connection, bidder, amount.toNumber() + accountRentExempt * 2);
   txBatch.addTransaction(createTokenAccountTx);
-  txBatch.addAfterTransaction(closeTokenAccountTx);
+
   txBatch.addSigner(payingAccount);
   ////
 
@@ -113,6 +120,8 @@ export const placeBid = async ({
   txBatch.addTransaction(createApproveTx);
   txBatch.addAfterTransaction(createRevokeTx);
   txBatch.addSigner(transferAuthority);
+
+  txBatch.addAfterTransaction(closeTokenAccountTx);
   ////
 
   // create place bid transaction
