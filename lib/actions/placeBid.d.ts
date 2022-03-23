@@ -14,6 +14,7 @@ interface IPlaceBidResponse {
     txId: TransactionSignature;
     bidderPotToken: PublicKey;
     bidderMeta: PublicKey;
+    payingAccount: PublicKey;
 }
 export declare const placeBid: ({ connection, wallet, amount, auction, bidderPotToken, }: IPlaceBidParams) => Promise<IPlaceBidResponse>;
 export {};
