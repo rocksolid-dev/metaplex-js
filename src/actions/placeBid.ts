@@ -15,7 +15,7 @@ import { TransactionsBatch } from '../utils/transactions-batch';
 import { getCancelBidTransactions } from './cancelBid';
 import { createApproveTxs, createWrappedAccountTxs } from './shared';
 
-interface IPlaceBidParams {
+interface IPlaceBidParams2 {
   connection: Connection;
   wallet: Wallet;
   auction: PublicKey;
@@ -25,7 +25,7 @@ interface IPlaceBidParams {
   commitment?: Commitment;
 }
 
-interface IPlaceBidResponse {
+interface IPlaceBidResponse2 {
   txId: TransactionSignature;
   bidderPotToken: PublicKey;
   bidderMeta: PublicKey;
@@ -38,7 +38,7 @@ export const placeBid = async ({
   amount,
   auction,
   bidderPotToken,
-}: IPlaceBidParams): Promise<IPlaceBidResponse> => {
+}: IPlaceBidParams2): Promise<IPlaceBidResponse2> => {
   // get data for transactions
   const bidder = wallet.publicKey;
   const accountRentExempt = await connection.getMinimumBalanceForRentExemption(AccountLayout.span);
