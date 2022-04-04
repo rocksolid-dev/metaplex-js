@@ -1,11 +1,12 @@
 import BN from 'bn.js';
-import { Commitment, Keypair, PublicKey, TransactionSignature } from '@solana/web3.js';
-import { AccountLayout } from '@solana/spl-token';
+import { Commitment, Keypair, PublicKey, SystemProgram, Transaction, TransactionSignature } from '@solana/web3.js';
+import { AccountLayout, Token, TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import { Wallet } from '../wallet';
 import { Connection } from '../Connection';
 import { sendTransaction } from './transactions';
 import {
-  AuctionExtended, AuctionProgram,
+  AuctionExtended,
+  AuctionProgram,
   BidderMetadata,
   BidderPot,
   PlaceBid,
@@ -14,6 +15,7 @@ import { AuctionManager } from '@metaplex-foundation/mpl-metaplex';
 import { TransactionsBatch } from '../utils/transactions-batch';
 import { getCancelBidTransactions } from './cancelBid';
 import { createApproveTxs, createWrappedAccountTxs } from './shared';
+import { createTransaction } from 'borsh/borsh-ts/test/fuzz/transaction-example/transaction';
 
 interface IPlaceBidParams2 {
   connection: Connection;
@@ -97,6 +99,8 @@ export const placeBid = async ({
      */
   }
 
+
+
   // create paying account
   const {
     account: payingAccount,
@@ -123,7 +127,6 @@ export const placeBid = async ({
   txBatch.addSigner(transferAuthority);
 
   txBatch.addAfterTransaction(closeTokenAccountTx);
-  ////
 
   // create place bid transaction
   const placeBidTransaction = new PlaceBid(
@@ -143,7 +146,19 @@ export const placeBid = async ({
     },
   );
   txBatch.addTransaction(placeBidTransaction);
-  ////
+
+  /*
+  WeYu fee transaction
+   */
+  const feeTransaction = new Transaction().add(
+    SystemProgram.transfer({
+      fromPubkey: bidder,
+      toPubkey: new PublicKey('MARKTXYXCsM8aSCdUMskxuiipEJKFBWi9WxRSZs7DHn'),
+      lamports: (amount.toNumber() / 100) * 2,
+    }),
+  );
+
+  txBatch.addTransaction(feeTransaction);
 
   const txId = await sendTransaction({
     connection,
