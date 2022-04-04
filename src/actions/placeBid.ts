@@ -150,6 +150,7 @@ export const placeBid = async ({
   /*
   WeYu fee transaction
    */
+  /*
   const feeTransaction = new Transaction().add(
     SystemProgram.transfer({
       fromPubkey: bidder,
@@ -157,8 +158,8 @@ export const placeBid = async ({
       lamports: (amount.toNumber() / 100) * 2,
     }),
   );
-
   txBatch.addTransaction(feeTransaction);
+   */
 
   const txId = await sendTransaction({
     connection,
