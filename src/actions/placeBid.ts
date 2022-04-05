@@ -15,7 +15,6 @@ import { AuctionManager } from '@metaplex-foundation/mpl-metaplex';
 import { TransactionsBatch } from '../utils/transactions-batch';
 import { getCancelBidTransactions } from './cancelBid';
 import { createApproveTxs, createWrappedAccountTxs } from './shared';
-import { createTransaction } from 'borsh/borsh-ts/test/fuzz/transaction-example/transaction';
 
 interface IPlaceBidParams2 {
   connection: Connection;
